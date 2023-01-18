@@ -63,10 +63,44 @@ gapminder_data%>%
   # %>% View() to view data
   
 
+#Working with messy data: skippng the first two rows and renaming the columns
 
+co2_emmsissions_dirty <-read_csv("data/co2-un-data.csv", skip = 2,
+         col_names = c("region", "country", "year", "series", "value", "footnote", "source"))
 
+co2_emmsissions_dirty%>%
+  select(country, year, series, value)%>%
+  mutate(series = recode(series,"Emissions (thousand metric tons of carbon dioxide)" = "total_emissions",
+                         "Emissions per capita (metric tons of carbon dioxide)" = "per_capita_emissions"))%>%
+  pivot_wider(names_from = series, values_from = value)
 
+#combining co2 data, and population data
 
+#filter data from 2005 and select to remove column from emission data
 
+co2_emissions <- co2_emmsissions_dirty%>%
+  select(country, year, series, value)%>%
+  mutate(series = recode(series,"Emissions (thousand metric tons of carbon dioxide)" = "total_emissions",
+                         "Emissions per capita (metric tons of carbon dioxide)" = "per_capita_emissions"))%>%
+  pivot_wider(names_from = series, values_from = value)%>%
+  filter(year==2005)%>%
+  select(-year)
+
+##Bringing in 2007 population data
+
+gapminder_data_2007 <- read_csv("data/gapminder_data.csv")%>%
+  filter(year==2007)%>%
+  select(country, pop, lifeExp, gdpPercap) #or select what you don't want to see
+
+#inner join: only include what is shared between two tables
+
+inner_join(co2_emissions, gapminder_data_2007, by = "country")
+
+anti_join(co2_emissions, gapminder_data_2007, by = "country")
+
+anti_join(gapminder_data_2007, co2_emissions, by = "country")
+
+full_join(co2_emissions, gapminder_data_2007)%>%
+  View()
 
 
