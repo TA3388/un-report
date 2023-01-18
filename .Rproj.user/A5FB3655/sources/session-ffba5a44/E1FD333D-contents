@@ -102,5 +102,14 @@ anti_join(gapminder_data_2007, co2_emissions, by = "country")
 
 full_join(co2_emissions, gapminder_data_2007)%>%
   View()
+# left and right joining data
+#co2_emissions%>%
+  #left_join(gapminder_data_2007)
 
 
+
+joined_co2_pop <- inner_join(co2_emissions, gapminder_data_2007, by = "country")
+
+#write object to csv
+
+write_csv(joined_co2_pop, file = "data/joined_co2_pop.csv")
